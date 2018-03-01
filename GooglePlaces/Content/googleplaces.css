@@ -1,0 +1,98 @@
+﻿/* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+h1, h2, h3, h4 {
+    font-family: 'Roboto','sans-serif';
+    margin: 15px 0 15px 0;
+}
+
+img {
+    height: 150px;
+    /*width: 150px;*/
+    z-index: 10;
+    margin: auto 10px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+#map {
+    width: 100%;
+    height: 400px;
+}
+
+#floating-panel {
+    position: absolute;
+    top: 50px;
+    left: 80%;
+    z-index: 5;
+    background-color: transparent;
+    padding: 5px;
+    text-align: center;
+    font-family: 'Roboto','sans-serif';
+}
+
+.inputfield {
+    margin: 5px auto;
+}
+
+.btn {
+    margin-left: 15px;
+}
+
+.separator {
+    border-right: 2px dotted #888888;
+}
+
+.img-separator {
+    display: block;
+    padding-left: 15px;
+    border-left: 2px dotted #888888;
+    z-index: 100;
+}
+
+.placebox {
+    -webkit-box-shadow: 10px 10px 25px -10px rgba(5,5,5,0.75);
+    -moz-box-shadow: 10px 10px 25px -10px rgba(5,5,5,0.75);
+    box-shadow: 10px 10px 25px -10px rgba(5,5,5,0.75);
+    border-radius: 5px 5px 5px 5px;
+    -moz-border-radius: 5px 5px 5px 5px;
+    -webkit-border-radius: 5px 5px 5px 5px;
+    border: 0px solid #000000;
+    background-color: #dddddd;
+    font-family: 'Roboto','sans-serif';
+    margin: 10px auto;
+    padding-top: 10px;
+}
+
+.recommended {
+    position: absolute;
+    display: inline-block;
+    transform: scale(0.75) rotate(15deg);
+    top: -60px;
+    right: -30px;
+    opacity: 10;
+    z-index: 20;
+}
+
+.rating-bar {
+    position: relative;
+    border-radius: 2px 2px 2px 2px;
+    background-color: #bbbbbb;
+    width: 105px;
+    height: 10px;
+    top: -15px;
+    left: 100px;
+    padding-left: 2px;
+    padding-top: 1px;
+}
+
+.bar-slice {
+    margin: auto 0;
+    padding-left: 0;
+    display: inline-block;
+    float: left;
+    color: limegreen;
+    background-color: limegreen;
+    width: 2px;
+    height: 8px;
+    z-index: 100;
+}

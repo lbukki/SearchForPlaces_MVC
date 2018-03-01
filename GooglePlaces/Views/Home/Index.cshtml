@@ -1,0 +1,140 @@
+﻿@model GooglePlaces.Models.IndexViewModel
+@using GooglePlaces.Controllers
+
+@{
+    ViewBag.Title = "Find Places with Google Map";
+    string route = "https://maps.googleapis.com/maps/api/js?key=" + Model.APIKey + "&callback=getMap";
+}
+
+<div id="map" class="placebox">
+    @*The map will be linked to this div*@
+</div>
+
+@using (Html.BeginForm("UpdateByCoordinates", "Home", FormMethod.Post, new { encType = "multipart/form-data" }))
+{
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <h4>Keresés koordináták alapján:</h4>
+    <div class="row placebox">
+        <div class="col-lg-6 separator">
+
+            <div class="form-group inputfield">
+                @Html.LabelFor(model => model.Latitude, "Szélesség: ", htmlAttributes: new { @class = "control-label col-lg-3 glyphicon-asterisk" })
+                <div class="col-lg-9">
+                    @Html.EditorFor(model => model.Latitude, new { htmlAttributes = new { @class = "form-control", @id = "latitude" } })
+                    @Html.ValidationMessageFor(model => model.Latitude, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div><span>&nbsp;</span></div>
+
+            <div class="form-group inputfield">
+                @Html.LabelFor(model => model.Longitude, "Hosszúság: ", htmlAttributes: new { @class = "control-label col-lg-3 glyphicon-asterisk" })
+                <div class="col-lg-9">
+                    @Html.EditorFor(model => model.Longitude, new { htmlAttributes = new { @class = "form-control", @id = "longitude" } })
+                    @Html.ValidationMessageFor(model => model.Longitude, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div><span>&nbsp;</span></div>
+
+            <div class="form-group inputfield">
+                @Html.LabelFor(model => model.TypeOfPlace, "Mit keres?: ", htmlAttributes: new { @class = "control-label col-lg-3 glyphicon-asterisk" })
+                <div class="col-lg-9">
+                    @Html.DropDownListFor(model => model.TypeOfPlace, new SelectList(Model.TypesOfPlaces.OrderBy(x => x.Value), "Key", "Value", "restaurant"), htmlAttributes: new { @class = "form-control", @id = "placetype" })
+                    @Html.ValidationMessageFor(model => model.TypeOfPlace, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div><span>&nbsp;</span></div>
+
+            <div class="form-group inputfield">
+                @Html.LabelFor(model => model.Radius, "Max. távolság (m): ", htmlAttributes: new { @class = "control-label col-lg-3 glyphicon-asterisk" })
+                <div class="col-lg-9">
+                    @Html.EditorFor(model => model.Radius, new { htmlAttributes = new { @class = "form-control", @id = "radius" } })
+                    @Html.ValidationMessageFor(model => model.Radius, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div><span>&nbsp;</span></div>
+
+            <div class="col-lg-offset-3">
+                @*<button id="getmapbycoord" type="button" class="btn btn-primary" onclick="location.href='@Url.Action("UpdateByCoordinates", "Home")'">Keresés koordináták alapján</button>*@
+                <input id="getmapbycoord" type="submit" value="Keresés koordináták alapján" class="btn btn-primary" />
+            </div>
+            <div><span>&nbsp;</span></div>
+
+        </div>
+
+        <div class="col-lg-6">
+
+            <div class="form-group inputfield">
+                @Html.LabelFor(model => model.Address, "Cím: ", htmlAttributes: new { @class = "control-label col-lg-3" })
+                <div class="col-lg-9">
+                    @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control", @id = "address" } })
+                    @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div><span>&nbsp;</span></div>
+
+            <div class="col-lg-offset-3">
+                <button id="getcoordinates" type="button" class="btn btn-primary">Koordináták lekérése</button>
+            </div>
+
+        </div>
+    </div>
+
+}
+
+<h4>Találatok @Html.Raw(Model.Radius) m-es körzetben a következőre: @Html.Raw(Model.TypesOfPlaces.FirstOrDefault(d => d.Key == Model.TypeOfPlace).Value)</h4>
+
+@if (Model.ModelPlaces.results != null && Model.ModelPlaces.results.Count > 0)
+{
+    for (int i = 0; i < (Model.ModelPlaces.results.Count > Model.NumberOfplaces ? Model.NumberOfplaces : Model.ModelPlaces.results.Count); i++)
+    {
+        <div class="row placebox">
+
+            <div class="col-lg-8">
+                <strong>@Html.Raw(i + 1). találat</strong>
+                <p>&nbsp;</p>
+                <p>Név: <a href="#map" style="text-decoration: none" class="place" data-lat="@Model.ModelPlaces.results[i].geometry.location.lat" data-lng="@Model.ModelPlaces.results[i].geometry.location.lng">@Html.Raw(Model.ModelPlaces.results[i].name)</a></p>
+                <p>Koordináták: @Model.ModelPlaces.results[i].geometry.location.lat<span> : </span>@Model.ModelPlaces.results[i].geometry.location.lng</p>
+                <div>
+                    Értékelés: @Model.ModelPlaces.results[i].rating
+                    <div class="rating-bar">
+                        @{
+                            double counter = 0;
+                            while (counter < Model.ModelPlaces.results[i].rating)
+                            {
+                                <i class="bar-slice"></i>
+                                counter += 0.1;
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 img-separator">
+                @if (Model.ModelPlaces.results[i].image != null)
+                {
+                    <img src="data: image; base64,@System.Convert.ToBase64String(Model.ModelPlaces.results[i].image)">
+                }
+                else
+                {
+                    <img src="~/Content/Images/noimage4.jpg">
+                }
+                @if (Model.ModelPlaces.results[i].rating >= 4.5)
+                {
+                    <div class="recommended" >
+                        <img src="~/Content/Images/recommended1.png">
+                    </div>
+                } 
+            </div>
+
+        </div>
+    }
+}
+
+
+
+@section scripts
+{
+    <script src="../../Scripts/googleplaces.js"></script>
+    <script async defer src=@route></script>
+}
